@@ -1,92 +1,304 @@
-{% extends "base.html" %}
-
-{% block title %}Login - Sistema ERP{% endblock %}
-
-{% block content %}
-<div class="login-container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
-                        <h3 class="card-title">Sistema ERP</h3>
-                        <p class="text-muted">Acesse sua conta</p>
-                    </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema ERP</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .login-header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .login-header h2 {
+            margin: 0;
+            font-weight: 300;
+            font-size: 1.8rem;
+        }
+        
+        .login-header p {
+            margin: 10px 0 0;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+        
+        .login-body {
+            padding: 40px 30px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e9ecef;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline-success-custom {
+            border: 2px solid #28a745;
+            color: #28a745;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-success-custom:hover {
+            background: #28a745;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .text-danger {
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 576px) {
+            .login-header {
+                padding: 30px 20px;
+            }
+            
+            .login-body {
+                padding: 30px 20px;
+            }
+            
+            .login-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-chart-line"></i>
+                <h2>Sistema ERP</h2>
+                <p>Gestão Empresarial Integrada</p>
+            </div>
+            
+            <div class="login-body">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{% if category == 'error' %}danger{% else %}{{ category }}{% endif %} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
                     
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            {{ form.empresa_id.label(class="form-label") }}
-                            {{ form.empresa_id(class="form-control form-control-lg") }}
-                            {% if form.empresa_id.errors %}
-                                {% for error in form.empresa_id.errors %}
-                                    <div class="text-danger small">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form.username.label(class="form-label") }}
-                            {{ form.username(class="form-control form-control-lg") }}
-                            {% if form.username.errors %}
-                                {% for error in form.username.errors %}
-                                    <div class="text-danger small">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-4">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control form-control-lg") }}
-                            {% if form.password.errors %}
-                                {% for error in form.password.errors %}
-                                    <div class="text-danger small">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Entrar
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <div class="text-center">
-                        <hr>
-                        {% if show_register_link %}
-                        <p class="text-muted mb-0">Não tem usuário cadastrado?</p>
-                        <div class="btn-group-vertical w-100" role="group">
-                            <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="showUserRegister()">
-                                <i class="fas fa-user-plus me-1"></i>Cadastrar Usuário
-                            </button>
-                        </div>
-                        <hr class="mt-3">
+                    <div class="mb-3">
+                        {{ form.empresa_id.label(class="form-label") }}
+                        {{ form.empresa_id(class="form-control") }}
+                        {% if form.empresa_id.errors %}
+                            {% for error in form.empresa_id.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         {% endif %}
-                        <p class="text-muted mb-0">Não tem uma empresa cadastrada?</p>
-                        <a href="{{ url_for('cadastro_empresa') }}" class="btn btn-outline-primary btn-sm mt-2">
-                            <i class="fas fa-plus me-1"></i>Cadastrar Empresa
-                        </a>
                     </div>
+                    
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="Digite seu usuário") }}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Digite sua senha") }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entrar no Sistema
+                        </button>
+                    </div>
+                </form>
+                
+                {% if show_register_link %}
+                <div class="divider">
+                    <span>Opções de Cadastro</span>
+                </div>
+                
+                <div class="text-center mb-3">
+                    <p class="text-muted mb-2">Não tem usuário cadastrado?</p>
+                    <button type="button" class="btn btn-outline-success-custom" onclick="showUserRegister()">
+                        <i class="fas fa-user-plus me-1"></i>Cadastrar Usuário
+                    </button>
+                </div>
+                {% endif %}
+                
+                <div class="divider">
+                    <span>Nova Empresa</span>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-muted mb-2">Primeira vez no sistema?</p>
+                    <a href="{{ url_for('cadastro_empresa') }}" class="btn btn-outline-custom">
+                        <i class="fas fa-building me-1"></i>Cadastrar Empresa
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-function showUserRegister() {
-    const empresaSelect = document.querySelector('#empresa_id');
-    const empresaId = empresaSelect.value;
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    if (empresaId == 0 || empresaId == '') {
-        alert('Selecione uma empresa primeiro para cadastrar um usuário.');
-        return;
-    }
-    
-    window.location.href = `/cadastro-usuario/${empresaId}`;
-}
-</script>
-{% endblock %}
+    <script>
+        function showUserRegister() {
+            const empresaSelect = document.querySelector('#empresa_id');
+            const empresaId = empresaSelect.value;
+            
+            if (empresaId == 0 || empresaId == '') {
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-warning alert-dismissible fade show';
+                alert.innerHTML = `
+                    Selecione uma empresa primeiro para cadastrar um usuário.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.login-body').insertBefore(alert, document.querySelector('form'));
+                return;
+            }
+            
+            window.location.href = `/cadastro-usuario/${empresaId}`;
+        }
+        
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                if (alert.querySelector('.btn-close')) {
+                    alert.querySelector('.btn-close').click();
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
