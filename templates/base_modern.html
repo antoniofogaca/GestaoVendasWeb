@@ -477,7 +477,7 @@
                 {% endif %}
                 {% if current_user.perm_produtos %}
                 <div class="nav-item">
-                    <a href="{{ url_for('produtos') }}" class="nav-link {% if request.endpoint in ['produtos', 'produtos_novo', 'produtos_editar'] %}active{% endif %}">
+                    <a href="/produtos" class="nav-link {% if '/produtos' in request.path %}active{% endif %}">
                         <i class="fas fa-box nav-icon"></i>
                         Produtos
                     </a>
@@ -485,7 +485,7 @@
                 {% endif %}
                 {% if current_user.perm_clientes %}
                 <div class="nav-item">
-                    <a href="{{ url_for('clientes') }}" class="nav-link {% if request.endpoint in ['clientes', 'clientes_novo', 'clientes_editar'] %}active{% endif %}">
+                    <a href="/clientes" class="nav-link {% if '/clientes' in request.path %}active{% endif %}">
                         <i class="fas fa-users nav-icon"></i>
                         Clientes
                     </a>
@@ -493,14 +493,14 @@
                 {% endif %}
                 {% if current_user.perm_fornecedores %}
                 <div class="nav-item">
-                    <a href="{{ url_for('fornecedores') }}" class="nav-link {% if request.endpoint in ['fornecedores', 'fornecedores_novo', 'fornecedores_editar'] %}active{% endif %}">
+                    <a href="/fornecedores" class="nav-link {% if '/fornecedores' in request.path %}active{% endif %}">
                         <i class="fas fa-truck nav-icon"></i>
                         Fornecedores
                     </a>
                 </div>
                 {% endif %}
                 <div class="nav-item">
-                    <a href="{{ url_for('vendedores') }}" class="nav-link {% if request.endpoint in ['vendedores', 'vendedores_novo', 'vendedores_editar'] %}active{% endif %}">
+                    <a href="/vendedores" class="nav-link {% if '/vendedores' in request.path %}active{% endif %}">
                         <i class="fas fa-user-tie nav-icon"></i>
                         Vendedores
                     </a>
