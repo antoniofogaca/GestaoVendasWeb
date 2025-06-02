@@ -73,6 +73,7 @@ class Produto(db.Model):
     estoque_minimo = db.Column(db.Integer, default=0)
     unidade = db.Column(db.String(10), default='UN')
     categoria = db.Column(db.String(100))
+    categoria_id = db.Column(db.Integer, db.ForeignKey('categorias.id'))
     ativo = db.Column(db.Boolean, default=True)
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresas.id'), nullable=False)
     data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
@@ -250,3 +251,48 @@ class ContaReceber(db.Model):
     
     def __repr__(self):
         return f'<ContaReceber {self.descricao}>'
+
+class Categoria(db.Model):
+    __tablename__ = 'categorias'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text)
+    ativo = db.Column(db.Boolean, default=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas.id'), nullable=False)
+    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relacionamentos
+    produtos = db.relationship('Produto', backref='categoria_rel', lazy=True)
+    
+    def __repr__(self):
+        return f'<Categoria {self.nome}>'
+
+class Servico(db.Model):
+    __tablename__ = 'servicos'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(200), nullable=False)
+    descricao = db.Column(db.Text)
+    preco = db.Column(db.Numeric(10, 2), nullable=False)
+    ativo = db.Column(db.Boolean, default=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas.id'), nullable=False)
+    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Servico {self.nome}>'
+
+class Banco(db.Model):
+    __tablename__ = 'bancos'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(10), nullable=False)
+    nome = db.Column(db.String(100), nullable=False)
+    agencia = db.Column(db.String(20))
+    conta = db.Column(db.String(30))
+    ativo = db.Column(db.Boolean, default=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresas.id'), nullable=False)
+    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Banco {self.nome}>'
