@@ -1,0 +1,310 @@
+{% extends "base_modern.html" %}
+{% set active_page = 'produtos' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="content-title">
+                <i class="fas fa-box text-primary me-3"></i>
+                {{ title }}
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/produtos">Produtos</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <a href="/produtos" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações do Produto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="produtoForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{ form.codigo.label(class="form-label") }}
+                                {{ form.codigo(class="form-control") }}
+                                {% if form.codigo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.codigo.errors[0] }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Deixe em branco para gerar automaticamente</small>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                {{ form.nome.label(class="form-label required") }}
+                                {{ form.nome(class="form-control") }}
+                                {% if form.nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nome.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.descricao.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.categoria.label(class="form-label") }}
+                                {{ form.categoria(class="form-control") }}
+                                {% if form.categoria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.categoria.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.unidade.label(class="form-label") }}
+                                {{ form.unidade(class="form-control") }}
+                                {% if form.unidade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.unidade.errors[0] }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="modern-card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-dollar-sign me-2"></i>
+                    Preços
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    {{ form.preco_custo.label(class="form-label") }}
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        {{ form.preco_custo(class="form-control", step="0.01") }}
+                    </div>
+                    {% if form.preco_custo.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.preco_custo.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.preco_venda.label(class="form-label required") }}
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        {{ form.preco_venda(class="form-control", step="0.01") }}
+                    </div>
+                    {% if form.preco_venda.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.preco_venda.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="margin-info mt-3 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <strong>Margem de Lucro:</strong>
+                        <span id="margem-lucro">-</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modern-card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-warehouse me-2"></i>
+                    Estoque
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    {{ form.estoque_atual.label(class="form-label") }}
+                    {{ form.estoque_atual(class="form-control") }}
+                    {% if form.estoque_atual.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.estoque_atual.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.estoque_minimo.label(class="form-label") }}
+                    {{ form.estoque_minimo(class="form-control") }}
+                    {% if form.estoque_minimo.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.estoque_minimo.errors[0] }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Alerta quando estoque atingir este valor</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog me-2"></i>
+                    Configurações
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    {{ form.ativo(class="form-check-input") }}
+                    {{ form.ativo.label(class="form-check-label") }}
+                </div>
+                <small class="form-text text-muted">Produtos inativos não aparecem no PDV</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="/produtos" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+            </a>
+            <button type="submit" form="produtoForm" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>
+                Salvar Produto
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.margin-info {
+    border-left: 4px solid #007bff;
+}
+
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: #6c757d;
+}
+
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+</style>
+
+<script>
+// Cálculo automático da margem de lucro
+function calcularMargem() {
+    const custoCampo = document.querySelector('input[name="preco_custo"]');
+    const vendaCampo = document.querySelector('input[name="preco_venda"]');
+    const margemSpan = document.getElementById('margem-lucro');
+    
+    const custo = parseFloat(custoCampo.value) || 0;
+    const venda = parseFloat(vendaCampo.value) || 0;
+    
+    if (custo > 0 && venda > 0) {
+        const margem = ((venda - custo) / custo * 100);
+        margemSpan.textContent = margem.toFixed(2) + '%';
+        margemSpan.className = margem > 0 ? 'text-success fw-bold' : 'text-danger fw-bold';
+    } else {
+        margemSpan.textContent = '-';
+        margemSpan.className = 'text-muted';
+    }
+}
+
+// Event listeners para cálculo automático
+document.querySelector('input[name="preco_custo"]').addEventListener('input', calcularMargem);
+document.querySelector('input[name="preco_venda"]').addEventListener('input', calcularMargem);
+
+// Calcular margem inicial
+calcularMargem();
+
+// Validação do formulário
+document.getElementById('produtoForm').addEventListener('submit', function(e) {
+    const nome = document.querySelector('input[name="nome"]').value;
+    const precoVenda = document.querySelector('input[name="preco_venda"]').value;
+    
+    if (!nome.trim()) {
+        e.preventDefault();
+        alert('O nome do produto é obrigatório!');
+        return false;
+    }
+    
+    if (!precoVenda || parseFloat(precoVenda) <= 0) {
+        e.preventDefault();
+        alert('O preço de venda deve ser maior que zero!');
+        return false;
+    }
+});
+</script>
+                </form>
+{% endblock %}

@@ -300,11 +300,10 @@ def produtos_lista():
             Produto.categoria.contains(search)
         ))
     
-    produtos = query.order_by(Produto.nome).paginate(
-        page=page, per_page=20, error_out=False
-    )
+    produtos = query.order_by(Produto.nome).all()
     
-    return render_template('produtos/lista.html', produtos=produtos, search=search)
+    from sqlalchemy import func
+    return render_template('produtos/lista_moderna.html', produtos=produtos, search=search, func=func, Produto=Produto)
 
 @app.route('/produtos/novo', methods=['GET', 'POST'])
 @login_required
@@ -333,7 +332,7 @@ def produto_novo():
         flash('Produto cadastrado com sucesso!', 'success')
         return redirect(url_for('produtos_lista'))
     
-    return render_template('produtos/form.html', form=form, title='Novo Produto')
+    return render_template('produtos/form_moderno.html', form=form, title='Novo Produto')
 
 @app.route('/produtos/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
@@ -349,7 +348,7 @@ def produto_editar(id):
         flash('Produto atualizado com sucesso!', 'success')
         return redirect(url_for('produtos_lista'))
     
-    return render_template('produtos/form.html', form=form, title='Editar Produto', produto=produto)
+    return render_template('produtos/form_moderno.html', form=form, title='Editar Produto', produto=produto)
 
 @app.route('/produtos/<int:id>/excluir', methods=['POST'])
 @login_required
@@ -379,11 +378,9 @@ def clientes_lista():
             Cliente.email.contains(search)
         ))
     
-    clientes = query.order_by(Cliente.nome).paginate(
-        page=page, per_page=20, error_out=False
-    )
+    clientes = query.order_by(Cliente.nome).all()
     
-    return render_template('clientes/lista.html', clientes=clientes, search=search)
+    return render_template('clientes/lista_moderna.html', clientes=clientes, search=search)
 
 @app.route('/clientes/novo', methods=['GET', 'POST'])
 @login_required

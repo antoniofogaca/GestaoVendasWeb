@@ -1,0 +1,251 @@
+{% extends "base_modern.html" %}
+{% set active_page = 'produtos' %}
+
+{% block title %}Produtos{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="content-title">
+                <i class="fas fa-box text-primary me-3"></i>
+                Produtos
+            </h1>
+            <p class="content-subtitle">Gerencie seu catálogo de produtos</p>
+        </div>
+        <div class="col-auto">
+            <a href="/produtos/novo" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>
+                Novo Produto
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon bg-primary">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stats-content">
+                <h3>{{ produtos.count() }}</h3>
+                <p>Total de Produtos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon bg-success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stats-content">
+                <h3>{{ produtos.filter_by(ativo=True).count() }}</h3>
+                <p>Produtos Ativos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon bg-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stats-content">
+                <h3>{{ produtos.filter(Produto.estoque_atual <= Produto.estoque_minimo).count() }}</h3>
+                <p>Estoque Baixo</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon bg-info">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stats-content">
+                <h3>R$ {{ "%.2f"|format(produtos.with_entities(func.sum(Produto.preco_venda * Produto.estoque_atual)).scalar() or 0) }}</h3>
+                <p>Valor em Estoque</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modern-card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Lista de Produtos
+                </h5>
+            </div>
+            <div class="col-auto">
+                <div class="input-group">
+                    <input type="search" class="form-control" placeholder="Buscar produtos..." id="searchInput">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover modern-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Status</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ produto.codigo or 'N/A' }}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="product-avatar me-3">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <strong>{{ produto.nome }}</strong>
+                                {% if produto.descricao %}
+                                <br><small class="text-muted">{{ produto.descricao[:50] }}{% if produto.descricao|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">{{ produto.categoria or 'Sem categoria' }}</span>
+                    </td>
+                    <td>
+                        <strong class="text-success">R$ {{ "%.2f"|format(produto.preco_venda) }}</strong>
+                        {% if produto.preco_custo > 0 %}
+                        <br><small class="text-muted">Custo: R$ {{ "%.2f"|format(produto.preco_custo) }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if produto.estoque_atual <= produto.estoque_minimo %}
+                        <span class="badge bg-danger">{{ produto.estoque_atual }} {{ produto.unidade }}</span>
+                        <br><small class="text-danger">Abaixo do mínimo ({{ produto.estoque_minimo }})</small>
+                        {% else %}
+                        <span class="badge bg-success">{{ produto.estoque_atual }} {{ produto.unidade }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if produto.ativo %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>Ativo
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger">
+                            <i class="fas fa-times me-1"></i>Inativo
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group" role="group">
+                            <a href="/produtos/{{ produto.id }}/editar" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmarExclusao({{ produto.id }})" title="Desativar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.product-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.modern-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    float: left;
+    margin-right: 15px;
+}
+
+.stats-content h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.stats-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #6c757d;
+}
+</style>
+
+<script>
+function confirmarExclusao(id) {
+    if (confirm('Tem certeza que deseja desativar este produto?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/produtos/${id}/excluir`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Filtro de busca
+document.getElementById('searchInput').addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.modern-table tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}
