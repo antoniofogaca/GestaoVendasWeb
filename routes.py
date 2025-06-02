@@ -609,6 +609,74 @@ def caixa_index():
                          total_saidas=total_saidas,
                          saldo=saldo)
 
+@app.route('/caixa/entrada', methods=['POST'])
+@login_required
+@permission_required('caixa')
+def caixa_entrada():
+    descricao = request.form.get('descricao')
+    valor = request.form.get('valor')
+    
+    if not descricao or not valor:
+        flash('Preencha todos os campos obrigatórios.', 'error')
+        return redirect(url_for('caixa_index'))
+    
+    try:
+        valor = float(valor)
+        if valor <= 0:
+            flash('O valor deve ser maior que zero.', 'error')
+            return redirect(url_for('caixa_index'))
+    except ValueError:
+        flash('Valor inválido.', 'error')
+        return redirect(url_for('caixa_index'))
+    
+    movimento = MovimentoCaixa(
+        empresa_id=session['empresa_id'],
+        descricao=descricao,
+        valor=valor,
+        tipo='ENTRADA',
+        data=datetime.now()
+    )
+    
+    db.session.add(movimento)
+    db.session.commit()
+    
+    flash('Entrada registrada com sucesso!', 'success')
+    return redirect(url_for('caixa_index'))
+
+@app.route('/caixa/saida', methods=['POST'])
+@login_required
+@permission_required('caixa')
+def caixa_saida():
+    descricao = request.form.get('descricao')
+    valor = request.form.get('valor')
+    
+    if not descricao or not valor:
+        flash('Preencha todos os campos obrigatórios.', 'error')
+        return redirect(url_for('caixa_index'))
+    
+    try:
+        valor = float(valor)
+        if valor <= 0:
+            flash('O valor deve ser maior que zero.', 'error')
+            return redirect(url_for('caixa_index'))
+    except ValueError:
+        flash('Valor inválido.', 'error')
+        return redirect(url_for('caixa_index'))
+    
+    movimento = MovimentoCaixa(
+        empresa_id=session['empresa_id'],
+        descricao=descricao,
+        valor=valor,
+        tipo='SAIDA',
+        data=datetime.now()
+    )
+    
+    db.session.add(movimento)
+    db.session.commit()
+    
+    flash('Saída registrada com sucesso!', 'success')
+    return redirect(url_for('caixa_index'))
+
 # Financeiro - Contas a Pagar
 @app.route('/financeiro/contas-pagar')
 @login_required
