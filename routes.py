@@ -33,13 +33,13 @@ def login():
         
         if empresa_id == 0:
             flash('Selecione uma empresa.', 'error')
-            return render_template('login.html', form=form)
+            return render_template('login_modern.html', form=form)
         
         # Buscar empresa
         empresa = Empresa.query.get(empresa_id)
         if not empresa or not empresa.ativa:
             flash('Empresa não encontrada ou desativada.', 'error')
-            return render_template('login.html', form=form)
+            return render_template('login_modern.html', form=form)
         
         # Buscar usuário
         user = Usuario.query.filter_by(username=username, empresa_id=empresa.id).first()
@@ -232,14 +232,39 @@ def dashboard():
     ultimas_vendas = Venda.query.filter_by(empresa_id=empresa.id)\
         .order_by(Venda.data_venda.desc()).limit(5).all()
     
-    return render_template('dashboard.html',
+    # Estatísticas organizadas para o template moderno
+    stats = {
+        'total_vendas_mes': Venda.query.filter(
+            func.extract('month', Venda.data_venda) == mes_atual,
+            func.extract('year', Venda.data_venda) == ano_atual,
+            Venda.empresa_id == empresa.id
+        ).count(),
+        'faturamento_mes': vendas_mes,
+        'total_clientes': total_clientes,
+        'total_produtos': total_produtos
+    }
+    
+    # Contas a pagar pendentes
+    contas_pagar_pendentes = ContaPagar.query.filter_by(
+        empresa_id=empresa.id, 
+        status='PENDENTE'
+    ).count()
+    
+    # Total de fornecedores e vendedores
+    total_fornecedores = Fornecedor.query.filter_by(empresa_id=empresa.id, ativo=True).count()
+    total_vendedores = Vendedor.query.filter_by(empresa_id=empresa.id, ativo=True).count()
+
+    return render_template('dashboard_modern.html',
+                         stats=stats,
                          vendas_hoje=vendas_hoje,
                          vendas_mes=vendas_mes,
                          total_produtos=total_produtos,
                          total_clientes=total_clientes,
                          produtos_estoque_baixo=produtos_estoque_baixo,
-                         contas_pagar_vencidas=contas_pagar_vencidas,
-                         contas_receber_vencidas=contas_receber_vencidas,
+                         contas_vencidas=contas_receber_vencidas,
+                         contas_pagar_pendentes=contas_pagar_pendentes,
+                         total_fornecedores=total_fornecedores,
+                         total_vendedores=total_vendedores,
                          ultimas_vendas=ultimas_vendas)
 
 # Rotas de Produtos
