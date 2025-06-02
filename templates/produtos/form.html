@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-box me-2"></i>{{ title }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('produtos_lista') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.codigo.label(class="form-label") }}
+                            {{ form.codigo(class="form-control") }}
+                            {% if form.codigo.errors %}
+                                {% for error in form.codigo.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-8 mb-3">
+                            {{ form.nome.label(class="form-label") }}
+                            {{ form.nome(class="form-control") }}
+                            {% if form.nome.errors %}
+                                {% for error in form.nome.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="3") }}
+                        {% if form.descricao.errors %}
+                            {% for error in form.descricao.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.preco_custo.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                {{ form.preco_custo(class="form-control", step="0.01") }}
+                            </div>
+                            {% if form.preco_custo.errors %}
+                                {% for error in form.preco_custo.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.preco_venda.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                {{ form.preco_venda(class="form-control", step="0.01") }}
+                            </div>
+                            {% if form.preco_venda.errors %}
+                                {% for error in form.preco_venda.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.unidade.label(class="form-label") }}
+                            {{ form.unidade(class="form-select") }}
+                            {% if form.unidade.errors %}
+                                {% for error in form.unidade.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.estoque_atual.label(class="form-label") }}
+                            {{ form.estoque_atual(class="form-control") }}
+                            {% if form.estoque_atual.errors %}
+                                {% for error in form.estoque_atual.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.estoque_minimo.label(class="form-label") }}
+                            {{ form.estoque_minimo(class="form-control") }}
+                            {% if form.estoque_minimo.errors %}
+                                {% for error in form.estoque_minimo.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="form-text">Quantidade mínima para alerta de estoque baixo</div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.categoria.label(class="form-label") }}
+                            {{ form.categoria(class="form-control") }}
+                            {% if form.categoria.errors %}
+                                {% for error in form.categoria.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="form-check">
+                                {{ form.ativo(class="form-check-input") }}
+                                {{ form.ativo.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Salvar
+                            </button>
+                            <a href="{{ url_for('produtos_lista') }}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Calcular margem automaticamente
+document.addEventListener('DOMContentLoaded', function() {
+    const precoCusto = document.getElementById('preco_custo');
+    const precoVenda = document.getElementById('preco_venda');
+    
+    function calcularMargem() {
+        const custo = parseFloat(precoCusto.value) || 0;
+        const venda = parseFloat(precoVenda.value) || 0;
+        
+        if (custo > 0 && venda > 0) {
+            const margem = ((venda - custo) / custo * 100).toFixed(2);
+            // Mostrar margem em algum lugar se necessário
+        }
+    }
+    
+    if (precoCusto && precoVenda) {
+        precoCusto.addEventListener('input', calcularMargem);
+        precoVenda.addEventListener('input', calcularMargem);
+    }
+});
+</script>
+{% endblock %}

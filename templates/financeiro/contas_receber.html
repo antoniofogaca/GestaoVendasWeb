@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Contas a Receber - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-file-invoice me-2"></i>Contas a Receber</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('conta_receber_nova') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-1"></i>Nova Conta
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               value="{{ request.args.get('search', '') }}" placeholder="Buscar por descrição, cliente...">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('contas_receber') }}" 
+                           class="btn btn-outline-secondary {% if not status %}active{% endif %}">
+                            Todas
+                        </a>
+                        <a href="{{ url_for('contas_receber', status='PENDENTE') }}" 
+                           class="btn btn-outline-warning {% if status == 'PENDENTE' %}active{% endif %}">
+                            Pendentes
+                        </a>
+                        <a href="{{ url_for('contas_receber', status='RECEBIDA') }}" 
+                           class="btn btn-outline-success {% if status == 'RECEBIDA' %}active{% endif %}">
+                            Recebidas
+                        </a>
+                        <a href="{{ url_for('contas_receber', status='VENCIDA') }}" 
+                           class="btn btn-outline-danger {% if status == 'VENCIDA' %}active{% endif %}">
+                            Vencidas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Contas -->
+<div class="card">
+    <div class="card-body">
+        {% if contas.items %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>Vencimento</th>
+                        <th>Recebimento</th>
+                        <th>Status</th>
+                        <th width="150">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conta in contas.items %}
+                    <tr class="{% if conta.status == 'VENCIDA' %}table-danger{% elif conta.status == 'RECEBIDA' %}table-success{% endif %}">
+                        <td>
+                            <strong>{{ conta.descricao }}</strong>
+                            {% if conta.venda %}
+                                <br><small class="text-muted">Venda: {{ conta.venda.numero }}</small>
+                            {% endif %}
+                            {% if conta.observacoes %}
+                                <br><small class="text-muted">{{ conta.observacoes[:50] }}{% if conta.observacoes|length > 50 %}...{% endif %}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ conta.cliente.nome if conta.cliente else '-' }}</td>
+                        <td>{{ "R$ {:,.2f}".format(conta.valor).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                        <td>{{ conta.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ conta.data_recebimento.strftime('%d/%m/%Y') if conta.data_recebimento else '-' }}</td>
+                        <td>
+                            {% if conta.status == 'PENDENTE' %}
+                                <span class="badge bg-warning">Pendente</span>
+                            {% elif conta.status == 'RECEBIDA' %}
+                                <span class="badge bg-success">Recebida</span>
+                            {% elif conta.status == 'VENCIDA' %}
+                                <span class="badge bg-danger">Vencida</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                {% if conta.status != 'RECEBIDA' %}
+                                    <button type="button" class="btn btn-sm btn-success" 
+                                            onclick="marcarComoRecebida({{ conta.id }})" title="Marcar como Recebida">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                {% endif %}
+                                <a href="{{ url_for('conta_receber_editar', id=conta.id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="confirmarExclusao({{ conta.id }})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginação -->
+        {% if contas.pages > 1 %}
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if contas.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('contas_receber', page=contas.prev_num, status=status) }}">
+                            Anterior
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for page in contas.iter_pages() %}
+                    {% if page %}
+                        {% if page != contas.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('contas_receber', page=page, status=status) }}">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page }}</span>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if contas.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('contas_receber', page=contas.next_num, status=status) }}">
+                            Próximo
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhuma conta a receber encontrada</h5>
+            <p class="text-muted">Comece cadastrando uma nova conta</p>
+            <a href="{{ url_for('conta_receber_nova') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Nova Conta
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir esta conta?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Marcar como Recebida -->
+<div class="modal fade" id="modalRecebimento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check me-2"></i>Marcar como Recebida</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formRecebimento" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Data do Recebimento</label>
+                        <input type="date" class="form-control" name="data_recebimento" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar Recebimento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function confirmarExclusao(id) {
+    document.getElementById('formExclusao').action = `/financeiro/contas-receber/${id}/excluir`;
+    new bootstrap.Modal(document.getElementById('modalConfirmacao')).show();
+}
+
+function marcarComoRecebida(id) {
+    document.getElementById('formRecebimento').action = `/financeiro/contas-receber/${id}/receber`;
+    // Definir data atual como padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.querySelector('#modalRecebimento input[name="data_recebimento"]').value = hoje;
+    new bootstrap.Modal(document.getElementById('modalRecebimento')).show();
+}
+</script>
+{% endblock %}

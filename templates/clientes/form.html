@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-users me-2"></i>{{ title }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('clientes_lista') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ form.tipo.label(class="form-label") }}
+                            {{ form.tipo(class="form-select", id="tipo") }}
+                            {% if form.tipo.errors %}
+                                {% for error in form.tipo.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-5 mb-3">
+                            {{ form.cpf_cnpj.label(class="form-label") }}
+                            <span id="label-documento">CPF</span>
+                            {{ form.cpf_cnpj(class="form-control", id="cpf_cnpj") }}
+                            {% if form.cpf_cnpj.errors %}
+                                {% for error in form.cpf_cnpj.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.nome.label(class="form-label") }}
+                            <span id="label-nome">Nome</span>
+                            {{ form.nome(class="form-control") }}
+                            {% if form.nome.errors %}
+                                {% for error in form.nome.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.telefone.label(class="form-label") }}
+                            {{ form.telefone(class="form-control", id="telefone") }}
+                            {% if form.telefone.errors %}
+                                {% for error in form.telefone.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.endereco.label(class="form-label") }}
+                        {{ form.endereco(class="form-control") }}
+                        {% if form.endereco.errors %}
+                            {% for error in form.endereco.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.cidade.label(class="form-label") }}
+                            {{ form.cidade(class="form-control") }}
+                            {% if form.cidade.errors %}
+                                {% for error in form.cidade.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            {{ form.uf.label(class="form-label") }}
+                            {{ form.uf(class="form-select") }}
+                            {% if form.uf.errors %}
+                                {% for error in form.uf.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            {{ form.cep.label(class="form-label") }}
+                            {{ form.cep(class="form-control", id="cep") }}
+                            {% if form.cep.errors %}
+                                {% for error in form.cep.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.observacoes.label(class="form-label") }}
+                        {{ form.observacoes(class="form-control", rows="3") }}
+                        {% if form.observacoes.errors %}
+                            {% for error in form.observacoes.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="form-check">
+                                {{ form.ativo(class="form-check-input") }}
+                                {{ form.ativo.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Salvar
+                            </button>
+                            <a href="{{ url_for('clientes_lista') }}" class="btn btn-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('tipo');
+    const cpfCnpjInput = document.getElementById('cpf_cnpj');
+    const telefoneInput = document.getElementById('telefone');
+    const cepInput = document.getElementById('cep');
+    
+    // Atualizar labels baseado no tipo
+    function atualizarLabels() {
+        const tipo = tipoSelect.value;
+        const labelDocumento = document.querySelector('label[for="cpf_cnpj"]');
+        const labelNome = document.querySelector('label[for="nome"]');
+        
+        if (tipo === 'PF') {
+            labelDocumento.innerHTML = 'CPF';
+            labelNome.innerHTML = 'Nome';
+            cpfCnpjInput.placeholder = '000.000.000-00';
+        } else {
+            labelDocumento.innerHTML = 'CNPJ';
+            labelNome.innerHTML = 'Razão Social';
+            cpfCnpjInput.placeholder = '00.000.000/0000-00';
+        }
+    }
+    
+    // Máscara para CPF/CNPJ
+    function aplicarMascaraDocumento() {
+        const tipo = tipoSelect.value;
+        let value = cpfCnpjInput.value.replace(/\D/g, '');
+        
+        if (tipo === 'PF') {
+            // CPF
+            value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1-$2');
+        } else {
+            // CNPJ
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        }
+        
+        cpfCnpjInput.value = value;
+    }
+    
+    // Máscara para telefone
+    function aplicarMascaraTelefone() {
+        let value = telefoneInput.value.replace(/\D/g, '');
+        if (value.length <= 10) {
+            value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+            value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        }
+        telefoneInput.value = value;
+    }
+    
+    // Máscara para CEP
+    function aplicarMascaraCep() {
+        let value = cepInput.value.replace(/\D/g, '');
+        value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+        cepInput.value = value;
+    }
+    
+    // Event listeners
+    tipoSelect.addEventListener('change', atualizarLabels);
+    cpfCnpjInput.addEventListener('input', aplicarMascaraDocumento);
+    telefoneInput.addEventListener('input', aplicarMascaraTelefone);
+    cepInput.addEventListener('input', aplicarMascaraCep);
+    
+    // Inicializar
+    atualizarLabels();
+});
+</script>
+{% endblock %}

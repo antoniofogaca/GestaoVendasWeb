@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Contas a Pagar - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-file-invoice-dollar me-2"></i>Contas a Pagar</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('conta_pagar_nova') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-1"></i>Nova Conta
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               value="{{ request.args.get('search', '') }}" placeholder="Buscar por descrição, fornecedor...">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('contas_pagar') }}" 
+                           class="btn btn-outline-secondary {% if not status %}active{% endif %}">
+                            Todas
+                        </a>
+                        <a href="{{ url_for('contas_pagar', status='PENDENTE') }}" 
+                           class="btn btn-outline-warning {% if status == 'PENDENTE' %}active{% endif %}">
+                            Pendentes
+                        </a>
+                        <a href="{{ url_for('contas_pagar', status='PAGA') }}" 
+                           class="btn btn-outline-success {% if status == 'PAGA' %}active{% endif %}">
+                            Pagas
+                        </a>
+                        <a href="{{ url_for('contas_pagar', status='VENCIDA') }}" 
+                           class="btn btn-outline-danger {% if status == 'VENCIDA' %}active{% endif %}">
+                            Vencidas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Contas -->
+<div class="card">
+    <div class="card-body">
+        {% if contas.items %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Fornecedor</th>
+                        <th>Valor</th>
+                        <th>Vencimento</th>
+                        <th>Pagamento</th>
+                        <th>Status</th>
+                        <th width="150">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conta in contas.items %}
+                    <tr class="{% if conta.status == 'VENCIDA' %}table-danger{% elif conta.status == 'PAGA' %}table-success{% endif %}">
+                        <td>
+                            <strong>{{ conta.descricao }}</strong>
+                            {% if conta.observacoes %}
+                                <br><small class="text-muted">{{ conta.observacoes[:50] }}{% if conta.observacoes|length > 50 %}...{% endif %}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ conta.fornecedor.razao_social if conta.fornecedor else '-' }}</td>
+                        <td>{{ "R$ {:,.2f}".format(conta.valor).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+                        <td>{{ conta.data_vencimento.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ conta.data_pagamento.strftime('%d/%m/%Y') if conta.data_pagamento else '-' }}</td>
+                        <td>
+                            {% if conta.status == 'PENDENTE' %}
+                                <span class="badge bg-warning">Pendente</span>
+                            {% elif conta.status == 'PAGA' %}
+                                <span class="badge bg-success">Paga</span>
+                            {% elif conta.status == 'VENCIDA' %}
+                                <span class="badge bg-danger">Vencida</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                {% if conta.status != 'PAGA' %}
+                                    <button type="button" class="btn btn-sm btn-success" 
+                                            onclick="marcarComoPaga({{ conta.id }})" title="Marcar como Paga">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                {% endif %}
+                                <a href="{{ url_for('conta_pagar_editar', id=conta.id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="confirmarExclusao({{ conta.id }})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginação -->
+        {% if contas.pages > 1 %}
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if contas.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('contas_pagar', page=contas.prev_num, status=status) }}">
+                            Anterior
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for page in contas.iter_pages() %}
+                    {% if page %}
+                        {% if page != contas.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('contas_pagar', page=page, status=status) }}">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page }}</span>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if contas.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('contas_pagar', page=contas.next_num, status=status) }}">
+                            Próximo
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhuma conta a pagar encontrada</h5>
+            <p class="text-muted">Comece cadastrando uma nova conta</p>
+            <a href="{{ url_for('conta_pagar_nova') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Nova Conta
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir esta conta?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Marcar como Paga -->
+<div class="modal fade" id="modalPagamento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check me-2"></i>Marcar como Paga</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formPagamento" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Data do Pagamento</label>
+                        <input type="date" class="form-control" name="data_pagamento" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function confirmarExclusao(id) {
+    document.getElementById('formExclusao').action = `/financeiro/contas-pagar/${id}/excluir`;
+    new bootstrap.Modal(document.getElementById('modalConfirmacao')).show();
+}
+
+function marcarComoPaga(id) {
+    document.getElementById('formPagamento').action = `/financeiro/contas-pagar/${id}/pagar`;
+    // Definir data atual como padrão
+    const hoje = new Date().toISOString().split('T')[0];
+    document.querySelector('#modalPagamento input[name="data_pagamento"]').value = hoje;
+    new bootstrap.Modal(document.getElementById('modalPagamento')).show();
+}
+</script>
+{% endblock %}
