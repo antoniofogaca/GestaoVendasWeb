@@ -450,15 +450,15 @@
             <div class="nav-section">
                 <div class="nav-section-title">Vendas</div>
                 <div class="nav-item">
-                    <a href="{{ url_for('pdv_index') }}" class="nav-link {% if request.endpoint == 'pdv_index' %}active{% endif %}">
+                    <a href="/pdv" class="nav-link {% if request.path == '/pdv' %}active{% endif %}">
                         <i class="fas fa-cash-register nav-icon"></i>
                         PDV
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="{{ url_for('vendas_lista') }}" class="nav-link {% if request.endpoint == 'vendas_lista' %}active{% endif %}">
+                    <a href="{{ url_for('relatorios') }}" class="nav-link {% if request.endpoint == 'relatorios' %}active{% endif %}">
                         <i class="fas fa-receipt nav-icon"></i>
-                        Pedidos
+                        Relatórios de Vendas
                     </a>
                 </div>
             </div>
@@ -477,7 +477,7 @@
                 {% endif %}
                 {% if current_user.perm_produtos %}
                 <div class="nav-item">
-                    <a href="{{ url_for('produtos_lista') }}" class="nav-link {% if request.endpoint in ['produtos_lista', 'produtos_novo', 'produtos_editar'] %}active{% endif %}">
+                    <a href="{{ url_for('produtos') }}" class="nav-link {% if request.endpoint in ['produtos', 'produtos_novo', 'produtos_editar'] %}active{% endif %}">
                         <i class="fas fa-box nav-icon"></i>
                         Produtos
                     </a>
@@ -485,7 +485,7 @@
                 {% endif %}
                 {% if current_user.perm_clientes %}
                 <div class="nav-item">
-                    <a href="{{ url_for('clientes_lista') }}" class="nav-link {% if request.endpoint in ['clientes_lista', 'clientes_novo', 'clientes_editar'] %}active{% endif %}">
+                    <a href="{{ url_for('clientes') }}" class="nav-link {% if request.endpoint in ['clientes', 'clientes_novo', 'clientes_editar'] %}active{% endif %}">
                         <i class="fas fa-users nav-icon"></i>
                         Clientes
                     </a>
@@ -493,14 +493,14 @@
                 {% endif %}
                 {% if current_user.perm_fornecedores %}
                 <div class="nav-item">
-                    <a href="{{ url_for('fornecedores_lista') }}" class="nav-link {% if request.endpoint in ['fornecedores_lista', 'fornecedores_novo', 'fornecedores_editar'] %}active{% endif %}">
+                    <a href="{{ url_for('fornecedores') }}" class="nav-link {% if request.endpoint in ['fornecedores', 'fornecedores_novo', 'fornecedores_editar'] %}active{% endif %}">
                         <i class="fas fa-truck nav-icon"></i>
                         Fornecedores
                     </a>
                 </div>
                 {% endif %}
                 <div class="nav-item">
-                    <a href="{{ url_for('vendedores_lista') }}" class="nav-link {% if request.endpoint in ['vendedores_lista', 'vendedores_novo', 'vendedores_editar'] %}active{% endif %}">
+                    <a href="{{ url_for('vendedores') }}" class="nav-link {% if request.endpoint in ['vendedores', 'vendedores_novo', 'vendedores_editar'] %}active{% endif %}">
                         <i class="fas fa-user-tie nav-icon"></i>
                         Vendedores
                     </a>
@@ -529,13 +529,13 @@
             <div class="nav-section">
                 <div class="nav-section-title">Financeiro</div>
                 <div class="nav-item">
-                    <a href="{{ url_for('contas_pagar') }}" class="nav-link {% if request.endpoint == 'contas_pagar' %}active{% endif %}">
+                    <a href="/financeiro/contas-pagar" class="nav-link {% if 'contas-pagar' in request.path %}active{% endif %}">
                         <i class="fas fa-file-invoice-dollar nav-icon"></i>
                         Contas a Pagar
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="{{ url_for('contas_receber') }}" class="nav-link {% if request.endpoint == 'contas_receber' %}active{% endif %}">
+                    <a href="/financeiro/contas-receber" class="nav-link {% if 'contas-receber' in request.path %}active{% endif %}">
                         <i class="fas fa-hand-holding-usd nav-icon"></i>
                         Contas a Receber
                     </a>
@@ -554,7 +554,7 @@
             <div class="nav-section">
                 <div class="nav-section-title">Caixa</div>
                 <div class="nav-item">
-                    <a href="{{ url_for('caixa_index') }}" class="nav-link {% if request.endpoint == 'caixa_index' %}active{% endif %}">
+                    <a href="/caixa" class="nav-link {% if request.path == '/caixa' %}active{% endif %}">
                         <i class="fas fa-cash-register nav-icon"></i>
                         Controle de Caixa
                     </a>
@@ -592,7 +592,7 @@
             <div class="nav-section">
                 <div class="nav-section-title">Configurações</div>
                 <div class="nav-item">
-                    <a href="{{ url_for('usuarios_lista') }}" class="nav-link {% if request.endpoint == 'usuarios_lista' %}active{% endif %}">
+                    <a href="/admin/usuarios" class="nav-link {% if '/admin/usuarios' in request.path %}active{% endif %}">
                         <i class="fas fa-user-cog nav-icon"></i>
                         Usuários
                     </a>
