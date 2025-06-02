@@ -81,35 +81,16 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ url_for('orcamentos_lista') }}" class="nav-link {% if request.endpoint in ['orcamentos_lista', 'orcamentos_novo', 'orcamentos_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Orçamentos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a href="{{ url_for('pdv_index') }}" class="nav-link {% if request.endpoint == 'pdv_index' %}active{% endif %}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>PDV</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('vendas_lista') }}" class="nav-link {% if request.endpoint in ['vendas_lista', 'vendas_novo', 'vendas_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Vendas</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     {% endif %}
 
-                    {% if current_user.perm_compras %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('compras_lista') }}" class="nav-link {% if request.endpoint in ['compras_lista', 'compras_novo', 'compras_editar'] %}active{% endif %}">
-                            <i class="nav-icon fas fa-shopping-basket"></i>
-                            <p>Compras</p>
-                        </a>
-                    </li>
-                    {% endif %}
+
 
                     <!-- Cadastros -->
                     <li class="nav-item {% if request.endpoint in ['produtos_lista', 'servicos_lista', 'clientes_lista', 'fornecedores_lista', 'vendedores_lista', 'bancos_lista', 'categorias_lista', 'ncm_lista'] %}menu-open{% endif %}">
@@ -128,18 +109,7 @@
                                     <p>Produtos</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('servicos_lista') }}" class="nav-link {% if request.endpoint in ['servicos_lista', 'servicos_novo', 'servicos_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Serviços</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('categorias_lista') }}" class="nav-link {% if request.endpoint in ['categorias_lista', 'categorias_novo', 'categorias_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Categorias</p>
-                                </a>
-                            </li>
+
                             {% endif %}
                             {% if current_user.perm_clientes %}
                             <li class="nav-item">
@@ -165,22 +135,7 @@
                                 </a>
                             </li>
                             {% endif %}
-                            {% if current_user.perm_financeiro %}
-                            <li class="nav-item">
-                                <a href="{{ url_for('bancos_lista') }}" class="nav-link {% if request.endpoint in ['bancos_lista', 'bancos_novo', 'bancos_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Bancos e Agências</p>
-                                </a>
-                            </li>
-                            {% endif %}
-                            {% if current_user.admin %}
-                            <li class="nav-item">
-                                <a href="{{ url_for('ncm_lista') }}" class="nav-link {% if request.endpoint in ['ncm_lista', 'ncm_novo', 'ncm_editar'] %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>NCM / CFOP / CEST</p>
-                                </a>
-                            </li>
-                            {% endif %}
+
                         </ul>
                     </li>
 
@@ -206,12 +161,7 @@
                                     <p>Contas a Receber</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('livro_caixa') }}" class="nav-link {% if request.endpoint == 'livro_caixa' %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Livro Caixa</p>
-                                </a>
-                            </li>
+
                         </ul>
                     </li>
                     {% endif %}
@@ -225,43 +175,7 @@
                     </li>
                     {% endif %}
 
-                    {% if current_user.perm_relatorios %}
-                    <li class="nav-item {% if request.endpoint in ['relatorios_vendas', 'relatorios_produtos', 'relatorios_clientes', 'relatorios_financeiro'] %}menu-open{% endif %}">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-bar"></i>
-                            <p>
-                                Relatórios
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ url_for('relatorios_vendas') }}" class="nav-link {% if request.endpoint == 'relatorios_vendas' %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Vendas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('relatorios_produtos') }}" class="nav-link {% if request.endpoint == 'relatorios_produtos' %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Produtos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('relatorios_clientes') }}" class="nav-link {% if request.endpoint == 'relatorios_clientes' %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Clientes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ url_for('relatorios_financeiro') }}" class="nav-link {% if request.endpoint == 'relatorios_financeiro' %}active{% endif %}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Financeiro</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    {% endif %}
+
 
                     {% if current_user.admin %}
                     <li class="nav-item {% if request.endpoint in ['empresa_lista', 'usuarios_lista'] %}menu-open{% endif %}">
