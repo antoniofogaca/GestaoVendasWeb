@@ -136,21 +136,21 @@
             <h5 class="card-title">Ações Rápidas</h5>
             <div class="actions-grid">
                 {% if current_user.perm_vendas %}
-                <a href="{{ url_for('pdv') }}" class="action-btn">
+                <a href="{{ url_for('pdv_index') }}" class="action-btn">
                     <i class="fas fa-cash-register"></i>
                     <span>Nova Venda</span>
                 </a>
                 {% endif %}
                 
                 {% if current_user.perm_produtos %}
-                <a href="{{ url_for('produto_novo') }}" class="action-btn">
+                <a href="{{ url_for('produtos_novo') }}" class="action-btn">
                     <i class="fas fa-plus"></i>
                     <span>Novo Produto</span>
                 </a>
                 {% endif %}
                 
                 {% if current_user.perm_clientes %}
-                <a href="{{ url_for('cliente_novo') }}" class="action-btn">
+                <a href="{{ url_for('clientes_novo') }}" class="action-btn">
                     <i class="fas fa-user-plus"></i>
                     <span>Novo Cliente</span>
                 </a>
