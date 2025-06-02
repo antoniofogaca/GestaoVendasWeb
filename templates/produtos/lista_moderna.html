@@ -29,7 +29,7 @@
                 <i class="fas fa-box"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ produtos.count() }}</h3>
+                <h3>{{ stats.total_produtos }}</h3>
                 <p>Total de Produtos</p>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ produtos.filter_by(ativo=True).count() }}</h3>
+                <h3>{{ stats.produtos_ativos }}</h3>
                 <p>Produtos Ativos</p>
             </div>
         </div>
@@ -51,7 +51,7 @@
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ produtos.filter(Produto.estoque_atual <= Produto.estoque_minimo).count() }}</h3>
+                <h3>{{ stats.estoque_baixo }}</h3>
                 <p>Estoque Baixo</p>
             </div>
         </div>
@@ -62,7 +62,7 @@
                 <i class="fas fa-dollar-sign"></i>
             </div>
             <div class="stats-content">
-                <h3>R$ {{ "%.2f"|format(produtos.with_entities(func.sum(Produto.preco_venda * Produto.estoque_atual)).scalar() or 0) }}</h3>
+                <h3>R$ {{ "%.2f"|format(stats.valor_estoque) }}</h3>
                 <p>Valor em Estoque</p>
             </div>
         </div>

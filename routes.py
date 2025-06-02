@@ -302,8 +302,20 @@ def produtos_lista():
     
     produtos = query.order_by(Produto.nome).all()
     
-    from sqlalchemy import func
-    return render_template('produtos/lista_moderna.html', produtos=produtos, search=search, func=func, Produto=Produto)
+    # Calcular estatísticas
+    total_produtos = len(produtos)
+    produtos_ativos = len([p for p in produtos if p.ativo])
+    estoque_baixo = len([p for p in produtos if p.estoque_atual <= p.estoque_minimo])
+    valor_estoque = sum(p.preco_venda * p.estoque_atual for p in produtos)
+    
+    stats = {
+        'total_produtos': total_produtos,
+        'produtos_ativos': produtos_ativos,
+        'estoque_baixo': estoque_baixo,
+        'valor_estoque': valor_estoque
+    }
+    
+    return render_template('produtos/lista_moderna.html', produtos=produtos, search=search, stats=stats)
 
 @app.route('/produtos/novo', methods=['GET', 'POST'])
 @login_required
@@ -380,7 +392,20 @@ def clientes_lista():
     
     clientes = query.order_by(Cliente.nome).all()
     
-    return render_template('clientes/lista_moderna.html', clientes=clientes, search=search)
+    # Calcular estatísticas
+    total_clientes = len(clientes)
+    clientes_ativos = len([c for c in clientes if c.ativo])
+    clientes_pf = len([c for c in clientes if c.tipo == 'PF'])
+    clientes_pj = len([c for c in clientes if c.tipo == 'PJ'])
+    
+    stats = {
+        'total_clientes': total_clientes,
+        'clientes_ativos': clientes_ativos,
+        'clientes_pf': clientes_pf,
+        'clientes_pj': clientes_pj
+    }
+    
+    return render_template('clientes/lista_moderna.html', clientes=clientes, search=search, stats=stats)
 
 @app.route('/clientes/novo', methods=['GET', 'POST'])
 @login_required

@@ -29,7 +29,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ clientes.count() }}</h3>
+                <h3>{{ stats.total_clientes }}</h3>
                 <p>Total de Clientes</p>
             </div>
         </div>
@@ -40,7 +40,7 @@
                 <i class="fas fa-user-check"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ clientes.filter_by(ativo=True).count() }}</h3>
+                <h3>{{ stats.clientes_ativos }}</h3>
                 <p>Clientes Ativos</p>
             </div>
         </div>
@@ -51,7 +51,7 @@
                 <i class="fas fa-user"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ clientes.filter_by(tipo='PF').count() }}</h3>
+                <h3>{{ stats.clientes_pf }}</h3>
                 <p>Pessoa Física</p>
             </div>
         </div>
@@ -62,7 +62,7 @@
                 <i class="fas fa-building"></i>
             </div>
             <div class="stats-content">
-                <h3>{{ clientes.filter_by(tipo='PJ').count() }}</h3>
+                <h3>{{ stats.clientes_pj }}</h3>
                 <p>Pessoa Jurídica</p>
             </div>
         </div>
