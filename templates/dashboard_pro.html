@@ -1,0 +1,558 @@
+{% extends "base_modern.html" %}
+
+{% block title %}Dashboard - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <h1 class="dashboard-title">Dashboard</h1>
+    <p class="text-muted">Visão geral do seu negócio</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card sales">
+            <div class="kpi-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-value">R$ {{ vendas_hoje|default(12450) }}</h3>
+                <p class="kpi-label">Vendas Hoje</p>
+                <span class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +12% vs ontem
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card orders">
+            <div class="kpi-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-value">{{ pedidos_hoje|default(48) }}</h3>
+                <p class="kpi-label">Pedidos</p>
+                <span class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +8% vs ontem
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card customers">
+            <div class="kpi-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-value">{{ total_clientes|default(1234) }}</h3>
+                <p class="kpi-label">Clientes</p>
+                <span class="kpi-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +3% vs semana passada
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card products">
+            <div class="kpi-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-value">{{ total_produtos|default(567) }}</h3>
+                <p class="kpi-label">Produtos</p>
+                <span class="kpi-alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    12 produtos em baixo estoque
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5 class="chart-title">Vendas da Semana</h5>
+                <p class="chart-subtitle">Evolução das vendas nos últimos 7 dias</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="salesChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5 class="chart-title">Top Produtos</h5>
+                <p class="chart-subtitle">Produtos mais vendidos</p>
+            </div>
+            <div class="top-products">
+                <div class="product-item">
+                    <div class="product-info">
+                        <span class="product-name">Produto A</span>
+                        <span class="product-sales">124 vendas</span>
+                    </div>
+                    <div class="product-value">R$ 5.420</div>
+                </div>
+                <div class="product-item">
+                    <div class="product-info">
+                        <span class="product-name">Produto B</span>
+                        <span class="product-sales">89 vendas</span>
+                    </div>
+                    <div class="product-value">R$ 3.890</div>
+                </div>
+                <div class="product-item">
+                    <div class="product-info">
+                        <span class="product-name">Produto C</span>
+                        <span class="product-sales">67 vendas</span>
+                    </div>
+                    <div class="product-value">R$ 2.150</div>
+                </div>
+                <div class="product-item">
+                    <div class="product-info">
+                        <span class="product-name">Produto D</span>
+                        <span class="product-sales">45 vendas</span>
+                    </div>
+                    <div class="product-value">R$ 1.890</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions and Recent Activity -->
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="quick-actions-card">
+            <h5 class="card-title">Ações Rápidas</h5>
+            <div class="actions-grid">
+                {% if current_user.perm_vendas %}
+                <a href="{{ url_for('pdv') }}" class="action-btn">
+                    <i class="fas fa-cash-register"></i>
+                    <span>Nova Venda</span>
+                </a>
+                {% endif %}
+                
+                {% if current_user.perm_produtos %}
+                <a href="{{ url_for('produto_novo') }}" class="action-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Novo Produto</span>
+                </a>
+                {% endif %}
+                
+                {% if current_user.perm_clientes %}
+                <a href="{{ url_for('cliente_novo') }}" class="action-btn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Novo Cliente</span>
+                </a>
+                {% endif %}
+                
+                {% if current_user.perm_financeiro %}
+                <a href="{{ url_for('contas_pagar') }}" class="action-btn">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Financeiro</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="recent-activity-card">
+            <div class="activity-header">
+                <h5 class="card-title">Atividades Recentes</h5>
+                <small class="text-muted">Últimas movimentações do sistema</small>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon success">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Venda #1234 realizada por {{ current_user.nome_completo or current_user.username }}</p>
+                        <span class="activity-time">Há 15 minutos</span>
+                    </div>
+                    <div class="activity-value">R$ 250,00</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon info">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Novo cliente cadastrado: João Silva</p>
+                        <span class="activity-time">Há 1 hora</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Produto "Notebook Dell" com estoque baixo</p>
+                        <span class="activity-time">Há 2 horas</span>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon success">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-text">Conta a receber #456 foi paga</p>
+                        <span class="activity-time">Há 3 horas</span>
+                    </div>
+                    <div class="activity-value">R$ 1.500,00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* Dashboard Styles */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+/* KPI Cards */
+.kpi-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-card.sales { border-left-color: #22c55e; }
+.kpi-card.orders { border-left-color: #3b82f6; }
+.kpi-card.customers { border-left-color: #8b5cf6; }
+.kpi-card.products { border-left-color: #f59e0b; }
+
+.kpi-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.sales .kpi-icon {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.orders .kpi-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.customers .kpi-icon {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.products .kpi-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-label {
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-trend {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.kpi-trend.positive {
+    color: #22c55e;
+}
+
+.kpi-alert {
+    color: #f59e0b;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.chart-header {
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.chart-subtitle {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Top Products */
+.top-products {
+    space-y: 1rem;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.product-sales {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.product-value {
+    font-weight: 600;
+    color: #22c55e;
+}
+
+/* Quick Actions */
+.quick-actions-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #475569;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.action-btn:hover {
+    background: #3b82f6;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.action-btn i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Recent Activity */
+.recent-activity-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.activity-header {
+    margin-bottom: 1.5rem;
+}
+
+.activity-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.activity-icon.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.activity-icon.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.activity-icon.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.activity-value {
+    font-weight: 600;
+    color: #22c55e;
+}
+</style>
+
+<script>
+// Sales Chart
+const ctx = document.getElementById('salesChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+        datasets: [{
+            label: 'Vendas (R$)',
+            data: [8000, 12000, 15000, 18000, 14000, 20000, 16000],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#3b82f6',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: '#64748b'
+                }
+            },
+            y: {
+                grid: {
+                    color: '#f1f5f9'
+                },
+                ticks: {
+                    color: '#64748b',
+                    callback: function(value) {
+                        return 'R$ ' + value.toLocaleString();
+                    }
+                }
+            }
+        },
+        elements: {
+            point: {
+                hoverBackgroundColor: '#3b82f6'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

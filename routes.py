@@ -254,17 +254,33 @@ def dashboard():
     total_fornecedores = Fornecedor.query.filter_by(empresa_id=empresa.id, ativo=True).count()
     total_vendedores = Vendedor.query.filter_by(empresa_id=empresa.id, ativo=True).count()
 
-    return render_template('dashboard_modern.html',
-                         stats=stats,
+    # Calcular pedidos de hoje
+    pedidos_hoje = Venda.query.filter(
+        func.date(Venda.data_venda) == hoje,
+        Venda.empresa_id == empresa.id
+    ).count()
+    
+    # Top produtos mais vendidos (últimos 30 dias)
+    inicio_mes = hoje - timedelta(days=30)
+    top_produtos = db.session.query(
+        Produto.nome,
+        func.sum(ItemVenda.quantidade).label('total_vendido'),
+        func.sum(ItemVenda.quantidade * ItemVenda.preco_unitario).label('total_valor')
+    ).join(ItemVenda).join(Venda).filter(
+        Venda.empresa_id == empresa.id,
+        Venda.data_venda >= inicio_mes
+    ).group_by(Produto.id, Produto.nome)\
+     .order_by(func.sum(ItemVenda.quantidade * ItemVenda.preco_unitario).desc())\
+     .limit(4).all()
+
+    return render_template('dashboard_pro.html',
                          vendas_hoje=vendas_hoje,
-                         vendas_mes=vendas_mes,
+                         pedidos_hoje=pedidos_hoje,
                          total_produtos=total_produtos,
                          total_clientes=total_clientes,
                          produtos_estoque_baixo=produtos_estoque_baixo,
-                         contas_vencidas=contas_receber_vencidas,
-                         contas_pagar_pendentes=contas_pagar_pendentes,
-                         total_fornecedores=total_fornecedores,
-                         total_vendedores=total_vendedores,
+                         top_produtos=top_produtos,
+                         vendas_mes=vendas_mes,
                          ultimas_vendas=ultimas_vendas)
 
 # Rotas de Produtos
