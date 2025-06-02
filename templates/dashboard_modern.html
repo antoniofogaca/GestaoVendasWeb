@@ -195,7 +195,7 @@
         <div class="modern-card" data-aos="fade-up" data-aos-delay="900">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="card-title mb-0">Status do Sistema</h5>
-                <small class="text-muted">Última atualização: {{ moment().format('DD/MM/YYYY HH:mm') }}</small>
+                <small class="text-muted" id="lastUpdate">Última atualização: {{ "agora" }}</small>
             </div>
             
             <div class="row g-4">
@@ -370,6 +370,9 @@
             // Animate counters
             animateCounters();
             
+            // Update timestamp
+            updateTimestamp();
+            
             // Reset button
             refreshBtn.innerHTML = originalContent;
             refreshBtn.disabled = false;
@@ -378,6 +381,23 @@
             showNotification('Dados atualizados com sucesso!', 'success');
         }, 2000);
     }
+    
+    // Update timestamp function
+    function updateTimestamp() {
+        const now = new Date();
+        const timestamp = now.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('lastUpdate').textContent = `Última atualização: ${timestamp}`;
+    }
+    
+    // Initialize timestamp and update every minute
+    updateTimestamp();
+    setInterval(updateTimestamp, 60000);
 
     // Animate counters
     function animateCounters() {
