@@ -4,7 +4,7 @@ from models import *
 from forms import *
 from auth import login_required, permission_required, get_current_user, get_current_empresa
 from utils import *
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from sqlalchemy import func, and_, or_
 
 @app.context_processor
