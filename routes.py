@@ -21,20 +21,24 @@ def index():
 def login():
     form = LoginForm()
     
+    # Carregar empresas para o dropdown
+    empresas = Empresa.query.filter_by(ativa=True).all()
+    form.empresa_id.choices = [(e.id, f"{e.nome_fantasia or e.razao_social} - {e.cnpj}") for e in empresas]
+    form.empresa_id.choices.insert(0, (0, 'Selecione uma empresa...'))
+    
     if form.validate_on_submit():
-        cnpj = form.empresa_cnpj.data.strip()
+        empresa_id = form.empresa_id.data
         username = form.username.data.strip()
         password = form.password.data
         
-        # Buscar empresa pelo CNPJ
-        empresa = Empresa.query.filter_by(cnpj=cnpj.replace('.', '').replace('/', '').replace('-', '')).first()
-        
-        if not empresa:
-            flash('Empresa não encontrada. Verifique o CNPJ informado.', 'error')
+        if empresa_id == 0:
+            flash('Selecione uma empresa.', 'error')
             return render_template('login.html', form=form)
         
-        if not empresa.ativa:
-            flash('Empresa desativada. Entre em contato com o suporte.', 'error')
+        # Buscar empresa
+        empresa = Empresa.query.get(empresa_id)
+        if not empresa or not empresa.ativa:
+            flash('Empresa não encontrada ou desativada.', 'error')
             return render_template('login.html', form=form)
         
         # Buscar usuário
@@ -57,7 +61,54 @@ def login():
         flash(f'Bem-vindo, {user.nome_completo or user.username}!', 'success')
         return redirect(url_for('dashboard'))
     
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, show_register_link=len(empresas) > 0)
+
+@app.route('/cadastro-usuario/<int:empresa_id>', methods=['GET', 'POST'])
+def cadastro_usuario(empresa_id):
+    empresa = Empresa.query.get_or_404(empresa_id)
+    form = CadastroUsuarioForm()
+    form.empresa_id.data = empresa_id
+    
+    if form.validate_on_submit():
+        if form.password.data != form.confirm_password.data:
+            flash('As senhas não coincidem.', 'error')
+            return render_template('cadastro_usuario.html', form=form, empresa=empresa)
+        
+        # Verificar se username já existe na empresa
+        existing_user = Usuario.query.filter_by(username=form.username.data, empresa_id=empresa_id).first()
+        if existing_user:
+            flash('Nome de usuário já existe nesta empresa.', 'error')
+            return render_template('cadastro_usuario.html', form=form, empresa=empresa)
+        
+        # Verificar se email já existe na empresa
+        existing_email = Usuario.query.filter_by(email=form.email.data, empresa_id=empresa_id).first()
+        if existing_email:
+            flash('E-mail já cadastrado nesta empresa.', 'error')
+            return render_template('cadastro_usuario.html', form=form, empresa=empresa)
+        
+        # Criar novo usuário
+        user = Usuario(
+            empresa_id=empresa_id,
+            username=form.username.data,
+            email=form.email.data,
+            nome_completo=form.nome_completo.data,
+            admin=False,
+            ativo=True,
+            # Permissões básicas para usuário comum
+            perm_vendas=True,
+            perm_produtos=True,
+            perm_clientes=True,
+            perm_caixa=True
+        )
+        user.set_password(form.password.data)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Usuário cadastrado com sucesso! Agora você pode fazer login.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('cadastro_usuario.html', form=form, empresa=empresa)
 
 @app.route('/logout')
 def logout():

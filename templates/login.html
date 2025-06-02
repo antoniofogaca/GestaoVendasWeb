@@ -18,10 +18,10 @@
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-3">
-                            {{ form.empresa_cnpj.label(class="form-label") }}
-                            {{ form.empresa_cnpj(class="form-control form-control-lg") }}
-                            {% if form.empresa_cnpj.errors %}
-                                {% for error in form.empresa_cnpj.errors %}
+                            {{ form.empresa_id.label(class="form-label") }}
+                            {{ form.empresa_id(class="form-control form-control-lg") }}
+                            {% if form.empresa_id.errors %}
+                                {% for error in form.empresa_id.errors %}
                                     <div class="text-danger small">{{ error }}</div>
                                 {% endfor %}
                             {% endif %}
@@ -56,6 +56,15 @@
                     
                     <div class="text-center">
                         <hr>
+                        {% if show_register_link %}
+                        <p class="text-muted mb-0">Não tem usuário cadastrado?</p>
+                        <div class="btn-group-vertical w-100" role="group">
+                            <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="showUserRegister()">
+                                <i class="fas fa-user-plus me-1"></i>Cadastrar Usuário
+                            </button>
+                        </div>
+                        <hr class="mt-3">
+                        {% endif %}
                         <p class="text-muted mb-0">Não tem uma empresa cadastrada?</p>
                         <a href="{{ url_for('cadastro_empresa') }}" class="btn btn-outline-primary btn-sm mt-2">
                             <i class="fas fa-plus me-1"></i>Cadastrar Empresa
@@ -66,4 +75,18 @@
         </div>
     </div>
 </div>
+
+<script>
+function showUserRegister() {
+    const empresaSelect = document.querySelector('#empresa_id');
+    const empresaId = empresaSelect.value;
+    
+    if (empresaId == 0 || empresaId == '') {
+        alert('Selecione uma empresa primeiro para cadastrar um usuário.');
+        return;
+    }
+    
+    window.location.href = `/cadastro-usuario/${empresaId}`;
+}
+</script>
 {% endblock %}

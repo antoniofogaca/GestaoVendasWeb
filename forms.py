@@ -4,9 +4,17 @@ from wtforms.validators import DataRequired, Email, Length, Optional, NumberRang
 from wtforms.widgets import TextArea
 
 class LoginForm(FlaskForm):
-    empresa_cnpj = StringField('CNPJ da Empresa', validators=[DataRequired()], render_kw={'placeholder': '00.000.000/0000-00'})
+    empresa_id = SelectField('Empresa', coerce=int, validators=[DataRequired()])
     username = StringField('Usuário', validators=[DataRequired()])
     password = PasswordField('Senha', validators=[DataRequired()])
+
+class CadastroUsuarioForm(FlaskForm):
+    empresa_id = HiddenField()
+    username = StringField('Usuário', validators=[DataRequired(), Length(max=64)])
+    email = StringField('E-mail', validators=[DataRequired(), Email(), Length(max=120)])
+    nome_completo = StringField('Nome Completo', validators=[DataRequired(), Length(max=200)])
+    password = PasswordField('Senha', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirmar Senha', validators=[DataRequired()])
 
 class EmpresaForm(FlaskForm):
     cnpj = StringField('CNPJ', validators=[DataRequired(), Length(min=14, max=18)], render_kw={'placeholder': '00.000.000/0000-00'})

@@ -7,8 +7,8 @@
     <h1 class="h2"><i class="fas fa-home me-2"></i>Dashboard</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-calendar me-1"></i>{{ moment().format('DD/MM/YYYY') }}
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="data-atual">
+                <i class="fas fa-calendar me-1"></i><span id="data-display"></span>
             </button>
         </div>
     </div>
@@ -187,8 +187,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const now = new Date();
     const dateStr = now.toLocaleDateString('pt-BR');
-    document.querySelector('.btn-outline-secondary').innerHTML = 
-        '<i class="fas fa-calendar me-1"></i>' + dateStr;
+    const displayElement = document.getElementById('data-display');
+    if (displayElement) {
+        displayElement.textContent = dateStr;
+    }
 });
 </script>
 {% endblock %}
