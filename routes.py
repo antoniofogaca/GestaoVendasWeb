@@ -46,11 +46,11 @@ def login():
         
         if not user or not user.check_password(password):
             flash('Usuário ou senha incorretos.', 'error')
-            return render_template('login.html', form=form)
+            return render_template('login_modern.html', form=form)
         
         if not user.ativo:
             flash('Usuário desativado. Entre em contato com o administrador.', 'error')
-            return render_template('login.html', form=form)
+            return render_template('login_modern.html', form=form)
         
         # Login bem-sucedido
         session['user_id'] = user.id
@@ -61,7 +61,7 @@ def login():
         flash(f'Bem-vindo, {user.nome_completo or user.username}!', 'success')
         return redirect(url_for('dashboard'))
     
-    return render_template('login.html', form=form, show_register_link=len(empresas) > 0)
+    return render_template('login_modern.html', form=form, show_register_link=len(empresas) > 0)
 
 @app.route('/cadastro-usuario/<int:empresa_id>', methods=['GET', 'POST'])
 def cadastro_usuario(empresa_id):

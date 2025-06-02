@@ -92,14 +92,14 @@
                 {% endif %}
                 
                 {% if current_user.perm_produtos %}
-                <a href="{{ url_for('produtos_novo') }}" class="btn btn-outline-primary">
+                <a href="{{ url_for('produto_novo') }}" class="btn btn-outline-primary">
                     <i class="fas fa-plus me-2"></i>
                     Adicionar Produto
                 </a>
                 {% endif %}
                 
                 {% if current_user.perm_clientes %}
-                <a href="{{ url_for('clientes_novo') }}" class="btn btn-outline-primary">
+                <a href="{{ url_for('cliente_novo') }}" class="btn btn-outline-primary">
                     <i class="fas fa-user-plus me-2"></i>
                     Novo Cliente
                 </a>
